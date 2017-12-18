@@ -7,7 +7,7 @@ set(GENJAVA_BIN_DIR "${genjava_DIR}/../../../@(CATKIN_PACKAGE_BIN_DESTINATION)")
 @[end if]@
 
 set(GENJAVA_BIN ${GENJAVA_BIN_DIR}/genjava_gradle_project.py)
-set(genjava_INSTALL_DIR "maven/org/ros/rosjava_messages")
+set(genjava_INSTALL_DIR "repository/org/ros/rosjava_messages")
 
 macro(_generate_msg_java ARG_PKG ARG_MSG ARG_IFLAGS ARG_MSG_DEPS ARG_GEN_OUTPUT_DIR)
   list(APPEND ALL_GEN_OUTPUT_FILES_java ${ARG_MSG} ${ARG_MSG_DEPS})
