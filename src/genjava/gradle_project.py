@@ -125,12 +125,12 @@ def create_msg_package_index():
             if ('message_generation' in [dep.name for dep in package.build_depends] or
                 'genmsg' in [dep.name for dep in package.build_depends] or
                 package.name in rosjava_build_tools.catkin.message_package_whitelist):
-#                 print(package.name)
-#                 print("  version: %s" % package.version)
-#                 print("  dependencies: ")
-#                 for dep in package.build_depends:
-#                     if not (dep.name == 'message_generation'):
-#                         print("         : %s" % dep)
+                #print(package.name)
+                #print("  version: %s" % package.version)
+                #print("  dependencies: ")
+                #for dep in package.build_depends:
+                #    if not (dep.name == 'message_generation'):
+                #        print("         : %s" % dep)
                 package_index[package.name] = package
     return package_index
 
@@ -163,11 +163,11 @@ def build(msg_pkg_name, output_dir, verbosity):
     # Are there droppings? If yes, then this genjava has marked this package as
     # needing a compile (it's new, or some msg file changed).
     droppings_file = os.path.join(output_dir, msg_pkg_name, 'droppings')
-    if not os.path.isfile(droppings_file):
+    #if not os.path.isfile(droppings_file):
         #print("Nobody left any droppings - nothing to do! %s" % droppings_file)
-        return
+        #return
     #print("Scooping the droppings! [%s]" % droppings_file)
-    os.remove(droppings_file)
+    #os.remove(droppings_file)
     cmd = ['./gradlew']
     if not verbosity:
         cmd.append('--quiet')
