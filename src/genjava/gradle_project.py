@@ -172,7 +172,7 @@ def build(msg_pkg_name, output_dir, verbosity):
     if not verbosity:
         cmd.append('--quiet')
     #print("COMMAND........................%s" % cmd)
-    subprocess.call(cmd, stderr=subprocess.STDOUT,)
+    return subprocess.call(cmd, stderr=subprocess.STDOUT,)
 
 
 def standalone_create_and_build(msg_pkg_name, output_dir, verbosity, avoid_rebuilding=False):
@@ -196,5 +196,4 @@ def standalone_create_and_build(msg_pkg_name, output_dir, verbosity, avoid_rebui
     if not verbosity:
         cmd.append('--quiet')
     #print("COMMAND........................%s" % cmd)
-    subprocess.call(cmd, stderr=subprocess.STDOUT,)
-    return True
+    return subprocess.call(cmd, stderr=subprocess.STDOUT,)
