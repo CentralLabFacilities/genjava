@@ -79,14 +79,9 @@ def main(argv):
     args = parse_arguments(argv[1:])
     #print("genjava %s/%s" % (args.package, args.message))
     if not args.compile:
-        ret = gradle_project.create(args.package, args.output_dir)
-        if ret != 0:
-            raise Exception('package generation failed!')
+        gradle_project.create(args.package, args.output_dir)
     else:
-        ret = gradle_project.build(args.package, args.output_dir, args.verbosity)
-        if ret != 0:
-            raise Exception('build failed!')
-    
+        gradle_project.build(args.package, args.output_dir, args.verbosity)
 
 
 def standalone_parse_arguments(argv):
