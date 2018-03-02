@@ -157,6 +157,7 @@ def create(msg_pkg_name, output_dir):
     pkg_directory = os.path.abspath(os.path.dirname(msg_package_index[msg_pkg_name].filename))
     msg_pkg_version = msg_package_index[msg_pkg_name].version
     populate_project(msg_pkg_name, msg_pkg_version, pkg_directory, genjava_gradle_dir, msg_dependencies)
+    return 0
 
 
 def build(msg_pkg_name, output_dir, verbosity):
