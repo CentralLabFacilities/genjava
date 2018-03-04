@@ -125,13 +125,16 @@ def create_msg_package_index():
             if ('message_generation' in [dep.name for dep in package.build_depends] or
                 'genmsg' in [dep.name for dep in package.build_depends] or
                 package.name in rosjava_build_tools.catkin.message_package_whitelist):
+                if (package.name not in rosjava_build_tools.catkin.message_package_blacklist):
+                    package_index[package.name] = package
+                else:
+                    print("%s is blacklisted!" % package.name)
                 #print(package.name)
                 #print("  version: %s" % package.version)
                 #print("  dependencies: ")
                 #for dep in package.build_depends:
                 #    if not (dep.name == 'message_generation'):
                 #        print("         : %s" % dep)
-                package_index[package.name] = package
     return package_index
 
 
