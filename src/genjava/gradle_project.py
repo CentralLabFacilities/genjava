@@ -119,6 +119,8 @@ def create_msg_package_index():
     package_index = {}
     ros_paths = rospkg.get_ros_package_path()
     ros_paths = [x for x in ros_paths.split(':') if x]
+    print("Blacklisted packages:")
+    print(rosjava_build_tools.catkin.message_package_blacklist)
     # packages that don't properly identify themselves as message packages (fix upstream).
     for path in reversed(ros_paths):  # make sure we pick up the source overlays last
         for unused_package_path, package in find_packages(path).items():
