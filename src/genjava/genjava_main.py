@@ -91,7 +91,7 @@ def main(argv):
 
 def standalone_parse_arguments(argv):
     parser = argparse.ArgumentParser(description='Generate artifacts for any/all discoverable message packages.')
-    parser.add_argument('-p', '--packages', action='store', nargs='*', default=[], help='a list of packages to generate artifacts for')
+    parser.add_argument('-p', '--packages', action='store', nargs='*', default=None, help='a list of packages to generate artifacts for')
     parser.add_argument('-o', '--output-dir', action='store', default='build', help='output directory for the java code (e.g. build/foo_msgs)')
     parser.add_argument('-v', '--verbose', default=False, action='store_true', help='enable verbosity in debugging (false)')
     parser.add_argument('-f', '--fakeit', default=False, action='store_true', help='dont build, just list the packages it would build (false)')
@@ -111,7 +111,6 @@ def standalone_main(argv):
 
     sorted_package_tuples = rosjava_build_tools.catkin.index_message_package_dependencies_from_local_environment(package_name_list=args.packages)
 
-    print("")
     print("Generating message artifacts for: \n%s" % [p.name for (unused_relative_path, p) in sorted_package_tuples])
     did_not_rebuild_these_packages = []
     if not args.fakeit:
