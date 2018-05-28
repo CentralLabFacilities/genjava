@@ -47,10 +47,13 @@ import tarfile
 
 
 def create_gradle_wrapper(repo_path):
-    archive_file = os.path.join(os.path.dirname(__file__), 'gradle', 'gradle.tar.gz')
-    archive = tarfile.open(archive_file)
-    archive.extractall(path=repo_path)
-    archive.close()
+    try:
+        archive_file = os.path.join(os.path.dirname(__file__), 'gradle', 'gradle.tar.gz')
+        archive = tarfile.open(archive_file)
+        archive.extractall(path=repo_path)
+        archive.close()
+    except Exception as e:
+        print(e)
 
 
 def read_template(tmplf):
