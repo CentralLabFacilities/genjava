@@ -47,13 +47,14 @@ import tarfile
 
 
 def create_gradle_wrapper(repo_path):
-    try:
-        archive_file = os.path.join(os.path.dirname(__file__), 'gradle', 'gradle.tar.gz')
-        archive = tarfile.open(archive_file)
-        archive.extractall(path=repo_path)
-        archive.close()
-    except Exception as e:
-        print(e)
+    # try:
+    #     archive_file = os.path.join(os.path.dirname(__file__), 'gradle', 'gradle.tar.gz')
+    #     archive = tarfile.open(archive_file)
+    #     archive.extractall(path=repo_path)
+    #     archive.close()
+    # except Exception as e:
+    #     print(e)
+    return
 
 
 def read_template(tmplf):
@@ -177,10 +178,10 @@ def build(msg_pkg_name, output_dir, verbosity):
         #return
     #print("Scooping the droppings! [%s]" % droppings_file)
     #os.remove(droppings_file)
-    cmd = ['./gradlew']
+    cmd = [get_genjava_wrapper()]
     if not verbosity:
         cmd.append('--quiet')
-    #print("COMMAND........................%s" % cmd)
+    print("COMMAND: %s" % cmd)
     return subprocess.call(cmd, stderr=subprocess.STDOUT,)
 
 
@@ -200,9 +201,13 @@ def standalone_create_and_build(msg_pkg_name, output_dir, verbosity, avoid_rebui
         return False
     create(msg_pkg_name, output_dir)
     working_directory = os.path.join(os.path.abspath(output_dir), msg_pkg_name)
-    gradle_wrapper = os.path.join(os.path.abspath(output_dir), msg_pkg_name, 'gradlew')
+    gradle_wrapper = get_genjava_wrapper()
     cmd = [gradle_wrapper, '-p', working_directory]
     if not verbosity:
         cmd.append('--quiet')
     #print("COMMAND........................%s" % cmd)
     return subprocess.call(cmd, stderr=subprocess.STDOUT,)
+
+
+def get_genjava_wrapper():
+    return os.path.join(os.path.dirname(__file__), 'gradle', 'gradlew')
