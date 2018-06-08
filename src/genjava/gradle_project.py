@@ -210,4 +210,13 @@ def standalone_create_and_build(msg_pkg_name, output_dir, verbosity, avoid_rebui
 
 
 def get_genjava_wrapper():
-    return os.path.join(os.path.dirname(__file__), 'gradle', 'gradlew')
+    #return os.path.join(os.path.dirname(__file__), 'gradle', 'gradlew')
+
+    #have to find pkg.
+    
+    #gradle_binary = os.path.join(os.path.dirname(__file__),'..', '..', '..', 'share', 'rosjava_build_tools', 'gradle', 'gradlew')
+
+    rospack = rospkg.RosPack()
+    gradle_binary = os.path.join(rospack.get_path('rosjava_build_tools'), 'gradle', 'gradlew')
+
+    return gradle_binary
