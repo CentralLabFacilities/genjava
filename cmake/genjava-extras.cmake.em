@@ -11,21 +11,6 @@ set(genjava_INSTALL_DIR "repository/org/ros/rosjava_messages")
 
 macro(_generate_msg_java ARG_PKG ARG_MSG ARG_IFLAGS ARG_MSG_DEPS ARG_GEN_OUTPUT_DIR)
   list(APPEND ALL_GEN_OUTPUT_FILES_java ${ARG_MSG} ${ARG_MSG_DEPS})
-
-    # Example arguments:
-    #
-    #   ARG_PKG      : foo_msgs
-    #   ARG_MSG      : /mnt/zaphod/ros/rosjava/hydro/src/foo_msgs/msg/Foo.msg
-    #   ARG_IFLAGS   : -Ifoo_msgs:/mnt/zaphod/ros/rosjava/hydro/src/foo_msgs/msg;-Istd_msgs:/opt/ros/hydro/share/std_msgs/cmake/../msg
-    #   ARG_MSG_DEPS : ???
-    #   ARG_GEN_OUTPUT_DIR : /mnt/zaphod/ros/rosjava/hydro/devel/${genjava_INSTALL_DIR}/foo_msgs
-    
-    #message(STATUS "Java generator for [${ARG_PKG}][${ARG_MSG}]")
-    #message(STATUS "  ARG_IFLAGS...........${ARG_IFLAGS}")
-    #message(STATUS "  ARG_MSG_DEPS.........${ARG_MSG_DEPS}")
-    #message(STATUS "  ARG_GEN_OUTPUT_DIR...${ARG_GEN_OUTPUT_DIR}")
-    #message(STATUS "GEN_MSG_JAVA...........done")
-    #message(STATUS "CMAKE_CURRENT_BINARY_DIR.......${CMAKE_CURRENT_BINARY_DIR}")
 endmacro()
 
 macro(_generate_srv_java ARG_PKG ARG_SRV ARG_IFLAGS ARG_MSG_DEPS ARG_GEN_OUTPUT_DIR)
@@ -85,7 +70,7 @@ macro(_generate_module_java ARG_PKG ARG_GEN_OUTPUT_DIR ARG_GENERATED_FILES)
             -p ${ARG_PKG}
         DEPENDS ${GRADLE_BUILD_FILE} ${ARG_GENERATED_FILES}
         WORKING_DIRECTORY ${GRADLE_BUILD_DIR}/${ARG_PKG}
-        COMMENT "Compiling Java code for ${ARG_PKG}"
+        #COMMENT "Compiling Java code for ${ARG_PKG}"
     )
     add_dependencies(${ARG_PKG}_generate_messages ${ARG_PKG}_generate_messages_java_gradle)
 

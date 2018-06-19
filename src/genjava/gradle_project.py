@@ -6,6 +6,7 @@
 
 from __future__ import print_function
 
+import sys
 import os
 import shutil
 import subprocess
@@ -42,21 +43,6 @@ def author_name():
     #    name = name.decode('utf-8')
     return name
 
-
-import tarfile
-
-
-def create_gradle_wrapper(repo_path):
-    # try:
-    #     archive_file = os.path.join(os.path.dirname(__file__), 'gradle', 'gradle.tar.gz')
-    #     archive = tarfile.open(archive_file)
-    #     archive.extractall(path=repo_path)
-    #     archive.close()
-    # except Exception as e:
-    #     print(e)
-    return
-
-
 def read_template(tmplf):
     f = open(tmplf, 'r')
     try:
@@ -64,6 +50,13 @@ def read_template(tmplf):
     finally:
         f.close()
     return t
+
+def get_genjava_wrapper():
+    #have to find pkg.
+    rospack = rospkg.RosPack()
+    gradle_binary = os.path.join(rospack.get_path('rosjava_build_tools'), 'gradle', 'gradlew')
+
+    return gradle_binary
 
 ##############################################################################
 # Methods acting on classes
@@ -143,6 +136,12 @@ def create_msg_package_index():
                 #        print("         : %s" % dep)
     return package_index
 
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
+def handle(function, path, excinfo):
+    eprint("error:", function, path, excinfo)
+
 
 def create(msg_pkg_name, output_dir):
     '''
@@ -153,8 +152,9 @@ def create(msg_pkg_name, output_dir):
     :param str output_dir:
     '''
     genjava_gradle_dir = os.path.join(output_dir, msg_pkg_name)
+    #print("creating genjava project pid", os.getpid(), "dir", genjava_gradle_dir)
     if os.path.exists(genjava_gradle_dir):
-        shutil.rmtree(genjava_gradle_dir)
+        shutil.rmtree(genjava_gradle_dir, onerror=handle)
     os.makedirs(genjava_gradle_dir)
     msg_package_index = create_msg_package_index()
     if msg_pkg_name not in msg_package_index.keys():
@@ -162,7 +162,6 @@ def create(msg_pkg_name, output_dir):
 
     msg_dependencies = create_dependency_string(msg_pkg_name, msg_package_index)
 
-    create_gradle_wrapper(genjava_gradle_dir)
     pkg_directory = os.path.abspath(os.path.dirname(msg_package_index[msg_pkg_name].filename))
     msg_pkg_version = msg_package_index[msg_pkg_name].version
     populate_project(msg_pkg_name, msg_pkg_version, pkg_directory, genjava_gradle_dir, msg_dependencies)
@@ -179,9 +178,10 @@ def build(msg_pkg_name, output_dir, verbosity):
     #print("Scooping the droppings! [%s]" % droppings_file)
     #os.remove(droppings_file)
     cmd = [get_genjava_wrapper()]
+    cmd.append('--console=plain')
     if not verbosity:
         cmd.append('--quiet')
-    print("COMMAND: %s" % cmd)
+    #print("COMMAND: %s" % cmd)
     return subprocess.call(cmd, stderr=subprocess.STDOUT,)
 
 
@@ -207,16 +207,3 @@ def standalone_create_and_build(msg_pkg_name, output_dir, verbosity, avoid_rebui
         cmd.append('--quiet')
     #print("COMMAND........................%s" % cmd)
     return subprocess.call(cmd, stderr=subprocess.STDOUT,)
-
-
-def get_genjava_wrapper():
-    #return os.path.join(os.path.dirname(__file__), 'gradle', 'gradlew')
-
-    #have to find pkg.
-    
-    #gradle_binary = os.path.join(os.path.dirname(__file__),'..', '..', '..', 'share', 'rosjava_build_tools', 'gradle', 'gradlew')
-
-    rospack = rospkg.RosPack()
-    gradle_binary = os.path.join(rospack.get_path('rosjava_build_tools'), 'gradle', 'gradlew')
-
-    return gradle_binary

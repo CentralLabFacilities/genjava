@@ -6,7 +6,7 @@
 @[end if]@
 
 set(GENJAVA_MESSAGE_ARTIFACTS_BIN ${GENJAVA_MESSAGE_ARTIFACTS_BIN_DIR}/genjava_message_artifacts)
-set(genjava_INSTALL_DIR "maven/org/ros/rosjava_messages")
+set(genjava_INSTALL_DIR "repository/org/ros/rosjava_messages")
 
 include(CMakeParseArguments)
 
