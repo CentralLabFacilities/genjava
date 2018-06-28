@@ -146,7 +146,7 @@ def handle(function, path, excinfo):
     eprint("error:", function, path, excinfo)
 
 
-def create(msg_pkg_name, output_dir, sources_dir):
+def create(msg_pkg_name, output_dir, sources_dir = None):
     '''
     Creates a standalone single project gradle build instance in the specified output directory and
     populates it with gradle wrapper and build.gradle file that will enable building of the artifact later.
