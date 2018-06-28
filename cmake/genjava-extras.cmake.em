@@ -10,11 +10,21 @@ set(GENJAVA_BIN ${GENJAVA_BIN_DIR}/genjava_gradle_project.py)
 set(genjava_INSTALL_DIR "repository/org/ros/rosjava_messages")
 
 macro(_generate_msg_java ARG_PKG ARG_MSG ARG_IFLAGS ARG_MSG_DEPS ARG_GEN_OUTPUT_DIR)
+  #MESSAGE("_generate_msg_java ")
+  #MESSAGE("ARG_MSG: ${ARG_MSG}")
+
   list(APPEND ALL_GEN_OUTPUT_FILES_java ${ARG_MSG} ${ARG_MSG_DEPS})
+  get_filename_component(GENJAVA_SOURCE_PATH ${ARG_MSG} DIRECTORY)
+  list(APPEND GENJAVA_SOURCES ${GENJAVA_SOURCE_PATH})
 endmacro()
 
 macro(_generate_srv_java ARG_PKG ARG_SRV ARG_IFLAGS ARG_MSG_DEPS ARG_GEN_OUTPUT_DIR)
+  #MESSAGE("_generate_srv_java ")
+  #MESSAGE("ARG_SRV: ${ARG_SRV}")
+
   list(APPEND ALL_GEN_OUTPUT_FILES_java ${ARG_SRV} ${ARG_MSG_DEPS})
+  get_filename_component(GENJAVA_SOURCE_PATH ${ARG_SRV} DIRECTORY)
+  list(APPEND GENJAVA_SOURCES ${GENJAVA_SOURCE_PATH})
 endmacro()
 
 # This is a bit different to the other generators - it generates the whole message package together
@@ -25,6 +35,15 @@ endmacro()
 # To facilitate this, the ARG_GENERATED_FILES is actually just the underlying ARG_MSG and ARG_SRV
 # files which we feed the commands as DEPENDS to trigger their execution.
 macro(_generate_module_java ARG_PKG ARG_GEN_OUTPUT_DIR ARG_GENERATED_FILES)
+    #MESSAGE("_generate_module_java")
+    #MESSAGE("ARG_PKG: ${ARG_PKG}")
+    #MESSAGE("ARG_GEN_OUTPUT_DIR: ${ARG_GEN_OUTPUT_DIR}")
+    #MESSAGE("ARG_GENERATED_FILES: ${ARG_GENERATED_FILES}")
+    list(REMOVE_DUPLICATES GENJAVA_SOURCES)
+    #MESSAGE("GENJAVA_SOURCES: ${GENJAVA_SOURCES}")
+
+    string(REPLACE ";" ":" GENJAVA_SOURCES_DOT "${GENJAVA_SOURCES}")
+
     ################################
     # Gradle Subproject
     ################################
@@ -42,6 +61,7 @@ macro(_generate_module_java ARG_PKG ARG_GEN_OUTPUT_DIR ARG_GENERATED_FILES)
         COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENJAVA_BIN}
             -o ${GRADLE_BUILD_DIR}
             -p ${ARG_PKG}
+            -s ${GENJAVA_SOURCES_DOT}
         COMMAND touch ${DROPPINGS_FILE}
         COMMENT "Generating Java gradle project from ${ARG_PKG}"
     )

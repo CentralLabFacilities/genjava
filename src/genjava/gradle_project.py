@@ -63,7 +63,10 @@ def get_genjava_wrapper():
 ##############################################################################
 
 
-def instantiate_genjava_template(template, project_name, project_version, pkg_directory, author, msg_dependencies):
+def instantiate_genjava_template(template, project_name, project_version, pkg_directory, author, msg_dependencies, sources_dir):
+    if sources_dir is None:
+        sources_dir = ""
+    sources_dir = sources_dir.replace(";", ":")
     return template % locals()
 
 
@@ -74,10 +77,10 @@ def get_templates():
     return templates
 
 
-def populate_project(project_name, project_version, pkg_directory, gradle_project_dir, msg_dependencies):
+def populate_project(project_name, project_version, pkg_directory, gradle_project_dir, msg_dependencies, sources_dir):
     author = author_name()
     for filename, template in get_templates().iteritems():
-        contents = instantiate_genjava_template(template, project_name, project_version, pkg_directory, author, msg_dependencies)
+        contents = instantiate_genjava_template(template, project_name, project_version, pkg_directory, author, msg_dependencies, sources_dir)
         try:
             p = os.path.abspath(os.path.join(gradle_project_dir, filename))
             f = open(p, 'w')
@@ -143,7 +146,7 @@ def handle(function, path, excinfo):
     eprint("error:", function, path, excinfo)
 
 
-def create(msg_pkg_name, output_dir):
+def create(msg_pkg_name, output_dir, sources_dir):
     '''
     Creates a standalone single project gradle build instance in the specified output directory and
     populates it with gradle wrapper and build.gradle file that will enable building of the artifact later.
@@ -164,7 +167,7 @@ def create(msg_pkg_name, output_dir):
 
     pkg_directory = os.path.abspath(os.path.dirname(msg_package_index[msg_pkg_name].filename))
     msg_pkg_version = msg_package_index[msg_pkg_name].version
-    populate_project(msg_pkg_name, msg_pkg_version, pkg_directory, genjava_gradle_dir, msg_dependencies)
+    populate_project(msg_pkg_name, msg_pkg_version, pkg_directory, genjava_gradle_dir, msg_dependencies, sources_dir)
     return 0
 
 
@@ -179,6 +182,7 @@ def build(msg_pkg_name, output_dir, verbosity):
     #os.remove(droppings_file)
     cmd = [get_genjava_wrapper()]
     cmd.append('--console=plain')
+    cmd.append('--no-daemon')
     if not verbosity:
         cmd.append('--quiet')
     #print("COMMAND: %s" % cmd)
