@@ -103,7 +103,7 @@ def create_dependency_string(project_name, msg_package_index):
     return gradle_dependency_string
 
 
-def create_msg_package_index():
+def create_msg_package_index(print_lists=True, verbosity=False):
     """
       Scans the package paths and creates a package index always taking the
       highest in the workspace chain (i.e. takes an overlay in preference when
@@ -119,21 +119,28 @@ def create_msg_package_index():
     package_index = {}
     ros_paths = rospkg.get_ros_package_path()
     ros_paths = [x for x in ros_paths.split(':') if x]
-    print("Blacklisted packages:")
-    print(rosjava_build_tools.catkin.message_package_blacklist)
-    print("Whitelisted packages:")
-    print(rosjava_build_tools.catkin.message_package_whitelist)
+    if print_lists:
+        print("Blacklisted packages:")
+        print(rosjava_build_tools.catkin.message_package_blacklist)
+        print("Whitelisted packages:")
+        print(rosjava_build_tools.catkin.message_package_whitelist)
+        if verbosity:
+            print("Message packages:")
     # packages that don't properly identify themselves as message packages (fix upstream).
     for path in reversed(ros_paths):  # make sure we pick up the source overlays last
-        for unused_package_path, package in find_packages(path).items():
+        for package_path, package in find_packages(path).items():
             if ('message_generation' in [dep.name for dep in package.build_depends] or
                 'genmsg' in [dep.name for dep in package.build_depends] or
                 package.name in rosjava_build_tools.catkin.message_package_whitelist):
                 if (package.name not in rosjava_build_tools.catkin.message_package_blacklist):
+                    if print_lists and verbosity:
+                        if package.name in package_index:
+                            print("!!overwrite!!")
+                        print(package.name)
+                        print("  path: %s" % path + "/" +  package_path)
+                        print("  version: %s" % package.version)
+                        print("  dependencies: ")
                     package_index[package.name] = package
-                #print(package.name)
-                #print("  version: %s" % package.version)
-                #print("  dependencies: ")
                 #for dep in package.build_depends:
                 #    if not (dep.name == 'message_generation'):
                 #        print("         : %s" % dep)
@@ -146,7 +153,7 @@ def handle(function, path, excinfo):
     eprint("error:", function, path, excinfo)
 
 
-def create(msg_pkg_name, output_dir, sources_dir = None):
+def create(msg_pkg_name, output_dir, sources_dir = None, verbosity=False, print_lists=True):
     '''
     Creates a standalone single project gradle build instance in the specified output directory and
     populates it with gradle wrapper and build.gradle file that will enable building of the artifact later.
@@ -159,7 +166,7 @@ def create(msg_pkg_name, output_dir, sources_dir = None):
     if os.path.exists(genjava_gradle_dir):
         shutil.rmtree(genjava_gradle_dir, onerror=handle)
     os.makedirs(genjava_gradle_dir)
-    msg_package_index = create_msg_package_index()
+    msg_package_index = create_msg_package_index(print_lists=print_lists, verbosity=verbosity)
     if msg_pkg_name not in msg_package_index.keys():
         raise IOError("could not find %s among message packages. Does the that package have a <build_depend> on message_generation in its package.xml?" % msg_pkg_name)
 
@@ -189,7 +196,7 @@ def build(msg_pkg_name, output_dir, verbosity):
     return subprocess.call(cmd, stderr=subprocess.STDOUT,)
 
 
-def standalone_create_and_build(msg_pkg_name, output_dir, verbosity, avoid_rebuilding=False):
+def standalone_create_and_build(msg_pkg_name, output_dir, verbosity, avoid_rebuilding=False, print_lists=False):
     '''
     Brute force create and build the message artifact disregarding any smarts
     such as whether message files changed or not. For use with the standalone
@@ -203,11 +210,17 @@ def standalone_create_and_build(msg_pkg_name, output_dir, verbosity, avoid_rebui
     genjava_gradle_dir = os.path.join(output_dir, msg_pkg_name)
     if os.path.exists(genjava_gradle_dir) and avoid_rebuilding:
         return False
-    create(msg_pkg_name, output_dir)
+    create(msg_pkg_name, output_dir, verbosity=verbosity, print_lists=print_lists)
     working_directory = os.path.join(os.path.abspath(output_dir), msg_pkg_name)
     gradle_wrapper = get_genjava_wrapper()
     cmd = [gradle_wrapper, '-p', working_directory]
+    cmd.append('--console=plain')
+    cmd.append('--no-daemon')
     if not verbosity:
         cmd.append('--quiet')
     #print("COMMAND........................%s" % cmd)
-    return subprocess.call(cmd, stderr=subprocess.STDOUT,)
+    ret = subprocess.call(cmd, stderr=subprocess.STDOUT,)
+    if ret is 0:
+        return True
+    else:
+        return ret

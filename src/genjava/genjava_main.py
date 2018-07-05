@@ -94,7 +94,7 @@ def standalone_parse_arguments(argv):
     parser = argparse.ArgumentParser(description='Generate artifacts for any/all discoverable message packages.')
     parser.add_argument('-p', '--packages', action='store', nargs='*', default=None, help='a list of packages to generate artifacts for')
     parser.add_argument('-o', '--output-dir', action='store', default='build', help='output directory for the java code (e.g. build/foo_msgs)')
-    parser.add_argument('-v', '--verbose', default=False, action='store_true', help='enable verbosity in debugging (false)')
+    parser.add_argument('-v', '--verbose', default=False, action='store_true', help=' verbosity in debugging (false)')
     parser.add_argument('-f', '--fakeit', default=False, action='store_true', help='dont build, just list the packages it would build (false)')
     parser.add_argument('-a', '--avoid-rebuilding', default=False, action='store_true', help='avoid rebuilding if the working directory is already present (false)')
     parsed_arguments = parser.parse_args(argv)
@@ -112,12 +112,15 @@ def standalone_main(argv):
 
     sorted_package_tuples = rosjava_build_tools.catkin.index_message_package_dependencies_from_local_environment(package_name_list=args.packages)
 
-    print("Generating message artifacts for: \n%s" % [p.name for (unused_relative_path, p) in sorted_package_tuples])
+    print("Generating message artifacts for: \n%s" % [p.name for (_, p) in sorted_package_tuples])
+    print_lists=True
     did_not_rebuild_these_packages = []
     if not args.fakeit:
-        for unused_relative_path, p in sorted_package_tuples:
-            result = gradle_project.standalone_create_and_build(p.name, args.output_dir, args.verbose, args.avoid_rebuilding)
+        for _, p in sorted_package_tuples:
+            result = gradle_project.standalone_create_and_build(p.name, args.output_dir, args.verbose, args.avoid_rebuilding, print_lists=print_lists)
+            print_lists=False
             if not result:
+                print("returncode " + str(result))
                 did_not_rebuild_these_packages.append(p.name)
     if did_not_rebuild_these_packages:
         print("")
