@@ -12,6 +12,7 @@ set(genjava_INSTALL_DIR "repository/org/ros/rosjava_messages")
 macro(_generate_msg_java ARG_PKG ARG_MSG ARG_IFLAGS ARG_MSG_DEPS ARG_GEN_OUTPUT_DIR)
   #MESSAGE("_generate_msg_java ")
   #MESSAGE("ARG_MSG: ${ARG_MSG}")
+  #MESSAGE(${ARG_MSG_DEPS})
 
   list(APPEND ALL_GEN_OUTPUT_FILES_java ${ARG_MSG} ${ARG_MSG_DEPS})
   get_filename_component(GENJAVA_SOURCE_PATH ${ARG_MSG} DIRECTORY)
@@ -50,6 +51,7 @@ macro(_generate_module_java ARG_PKG ARG_GEN_OUTPUT_DIR ARG_GENERATED_FILES)
         MESSAGE(WARNING "using verbose message gen")
     else()
         set(verbosity "")
+        MESSAGE(WARNING "not using verbose message gen")
     endif()
     
 
