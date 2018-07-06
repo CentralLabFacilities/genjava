@@ -44,6 +44,15 @@ macro(_generate_module_java ARG_PKG ARG_GEN_OUTPUT_DIR ARG_GENERATED_FILES)
 
     string(REPLACE ";" ":" GENJAVA_SOURCES_DOT "${GENJAVA_SOURCES}")
 
+    set(ROS_GRADLE_VERBOSE $ENV{ROS_GRADLE_VERBOSE})
+    if(ROS_GRADLE_VERBOSE)
+        set(verbosity "--verbosity")
+        MESSAGE(WARNING "using verbose message gen")
+    else()
+        set(verbosity "")
+    endif()
+    
+
     ################################
     # Gradle Subproject
     ################################
@@ -59,6 +68,7 @@ macro(_generate_module_java ARG_PKG ARG_GEN_OUTPUT_DIR ARG_GENERATED_FILES)
     add_custom_command(OUTPUT ${GRADLE_BUILD_FILE}
         DEPENDS ${GENJAVA_BIN} ${ARG_GENERATED_FILES}
         COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENJAVA_BIN}
+            ${verbosity}
             -o ${GRADLE_BUILD_DIR}
             -p ${ARG_PKG}
             -s ${GENJAVA_SOURCES_DOT}
@@ -75,12 +85,6 @@ macro(_generate_module_java ARG_PKG ARG_GEN_OUTPUT_DIR ARG_GENERATED_FILES)
     # the last thing, then it may be trying to compile while dependencies are still getting
     # themselves ready for ${ARG_PKG}_generate_messages in parallel.
     # (i.e. beware of sequencing add_custom_command, it usually has to compete)
-    set(ROS_GRADLE_VERBOSE $ENV{ROS_GRADLE_VERBOSE})
-    if(ROS_GRADLE_VERBOSE)
-        set(verbosity "--verbosity")
-    else()
-        set(verbosity "")
-    endif()
 
     add_custom_target(${ARG_PKG}_generate_messages_java_gradle
         COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENJAVA_BIN}

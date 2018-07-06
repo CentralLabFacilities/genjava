@@ -124,8 +124,6 @@ def create_msg_package_index(print_lists=True, verbosity=False):
         print(rosjava_build_tools.catkin.message_package_blacklist)
         print("Whitelisted packages:")
         print(rosjava_build_tools.catkin.message_package_whitelist)
-        if verbosity:
-            print("Message packages:")
     # packages that don't properly identify themselves as message packages (fix upstream).
     for path in reversed(ros_paths):  # make sure we pick up the source overlays last
         for package_path, package in find_packages(path).items():
@@ -136,14 +134,25 @@ def create_msg_package_index(print_lists=True, verbosity=False):
                     if print_lists and verbosity:
                         if package.name in package_index:
                             print("!!overwrite!!")
-                        print(package.name)
-                        print("  path: %s" % path + "/" +  package_path)
-                        print("  version: %s" % package.version)
-                        print("  dependencies: ")
+                            print(package.name)
+                            print("  path: %s, (OLD: %s)" % (path + "/" + package_path, package_index[package.name].filename))
+                            print("  version: %s, (OLD: %s)" % (package.version, package_index[package.name].version))
                     package_index[package.name] = package
-                #for dep in package.build_depends:
-                #    if not (dep.name == 'message_generation'):
-                #        print("         : %s" % dep)
+
+    if print_lists and verbosity:
+        print("Message packages:")
+        for package in package_index:
+            pkg = package_index[package]
+            print(package)
+            # for attr in dir(pkg):
+            #     print("pkg.%s = %r" % (attr, getattr(pkg, attr)))
+            print("  file: %s" % pkg.filename)
+            print("  version: %s" % pkg.version)
+            print("  dependency:")
+            for dep in pkg.build_depends:
+                if not (dep.name == 'message_generation'):
+                    print("         : %s" % dep)
+
     return package_index
 
 def eprint(*args, **kwargs):
