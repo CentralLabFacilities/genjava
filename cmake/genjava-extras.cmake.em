@@ -94,7 +94,7 @@ macro(_generate_module_java ARG_PKG ARG_GEN_OUTPUT_DIR ARG_GENERATED_FILES)
             -p ${ARG_PKG}
         DEPENDS ${GRADLE_BUILD_FILE} ${ARG_GENERATED_FILES}
         WORKING_DIRECTORY ${GRADLE_BUILD_DIR}/${ARG_PKG}
-        #COMMENT "Compiling Java code for ${ARG_PKG}"
+        COMMENT "Compiling Java code for ${ARG_PKG}"
     )
     add_dependencies(${ARG_PKG}_generate_messages ${ARG_PKG}_generate_messages_java_gradle)
 

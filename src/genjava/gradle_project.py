@@ -133,14 +133,14 @@ def create_msg_package_index(print_lists=True, verbosity=False):
                 if (package.name not in rosjava_build_tools.catkin.message_package_blacklist):
                     if print_lists and verbosity:
                         if package.name in package_index:
-                            print("!!overwrite!!")
-                            print(package.name)
-                            print("  path: %s, (OLD: %s)" % (path + "/" + package_path, package_index[package.name].filename))
-                            print("  version: %s, (OLD: %s)" % (package.version, package_index[package.name].version))
+                            print("!!Overlay!!")
+                            print("  %s" % package.name)
+                            print("    path: %s, (OLD: %s)" % (path + "/" + package_path, package_index[package.name].filename))
+                            print("    version: %s, (OLD: %s)" % (package.version, package_index[package.name].version))
                     package_index[package.name] = package
 
     if print_lists and verbosity:
-        print("Message packages:")
+        print("Message package list:")
         for package in package_index:
             pkg = package_index[package]
             print(package)
@@ -183,6 +183,8 @@ def create(msg_pkg_name, output_dir, sources_dir = None, verbosity=False, print_
 
     pkg_directory = os.path.abspath(os.path.dirname(msg_package_index[msg_pkg_name].filename))
     msg_pkg_version = msg_package_index[msg_pkg_name].version
+    if verbosity:
+        eprint("Create Message Package: %s:%s" % (msg_pkg_name, msg_pkg_version))
     populate_project(msg_pkg_name, msg_pkg_version, pkg_directory, genjava_gradle_dir, msg_dependencies, sources_dir)
     return 0
 
