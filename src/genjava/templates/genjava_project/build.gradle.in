@@ -53,6 +53,9 @@ task generateSources (type: JavaExec) {
     classpath = configurations.runtime
     main = 'org.ros.internal.message.GenerateInterfaces'
     tasks.compileJava.source outputs.files
+    doLast {
+        if("$System.env.ROS_GRADLE_VERBOSE" == "true") println 'Create PKG from %(pkg_directory)s'
+    }
 }
 
 dependencies {
@@ -89,6 +92,12 @@ task info << {
     tasks["generateSources"].outputs.getFiles().getAsFileTree().each {
         println "Files         : ${it}"
     }
+
+    println "\nPublish Info"
+    println "============\n"
+
+    println "publishMavenJavaPublicationToMavenRepository"
+    println "Target        : 'file://' + ${project.ros.mavenDeploymentRepository}"
 }
 
 /* Damon's message generator doesn't catch every message. It expects everything to be nicely under 'msg'

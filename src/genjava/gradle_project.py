@@ -204,6 +204,13 @@ def build(msg_pkg_name, output_dir, verbosity):
     if not verbosity:
         cmd.append('--quiet')
     #print("COMMAND: %s" % cmd)
+
+    if verbosity:
+        info = cmd[:]
+        info.append('info')
+        subprocess.call(info)
+        print("CALLING COMMAND: %s" % cmd)
+
     return subprocess.call(cmd, stderr=subprocess.STDOUT,)
 
 
