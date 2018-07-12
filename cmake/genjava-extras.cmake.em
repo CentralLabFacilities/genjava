@@ -59,24 +59,37 @@ macro(_generate_module_java ARG_PKG ARG_GEN_OUTPUT_DIR ARG_GENERATED_FILES)
     # Gradle Subproject
     ################################
     set(GRADLE_BUILD_DIR "${CMAKE_CURRENT_BINARY_DIR}/java")
-    set(GRADLE_BUILD_FILE "${GRADLE_BUILD_DIR}/${ARG_PKG}/build.gradle")
-    list(APPEND ALL_GEN_OUTPUT_FILES_java ${GRADLE_BUILD_FILE})
+    # set(GRADLE_BUILD_FILE "${GRADLE_BUILD_DIR}/${ARG_PKG}/build.gradle")
+    # list(APPEND ALL_GEN_OUTPUT_FILES_java ${GRADLE_BUILD_FILE})
     # a marker for the compiling script later to discover
     # this command will only get run when an underlying dependency changes, whereas the compiling
     # add_custom_target always runs (this was so we can ensure compile time dependencies are ok).
     # So we leave this dropping to inform it when gradle needs to run so that we can skip by
     # without the huge latency whenever we don't.
-    set(DROPPINGS_FILE "${GRADLE_BUILD_DIR}/${ARG_PKG}/droppings")
-    add_custom_command(OUTPUT ${GRADLE_BUILD_FILE}
-        DEPENDS ${GENJAVA_BIN} ${ARG_GENERATED_FILES}
+    # set(DROPPINGS_FILE "${GRADLE_BUILD_DIR}/${ARG_PKG}/droppings")
+    # add_custom_command(OUTPUT ${GRADLE_BUILD_FILE}
+    #     DEPENDS ${GENJAVA_BIN} ${ARG_GENERATED_FILES}
+    #     COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENJAVA_BIN}
+    #         ${verbosity}
+    #         -o ${GRADLE_BUILD_DIR}
+    #         -p ${ARG_PKG}
+    #         -s ${GENJAVA_SOURCES_DOT}
+    #     COMMAND touch ${DROPPINGS_FILE}
+    #     COMMENT "Generating Java gradle project from ${ARG_PKG}"
+    # )
+
+    add_custom_target(${ARG_PKG}_generate_messages_java_gradle_create
         COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENJAVA_BIN}
             ${verbosity}
             -o ${GRADLE_BUILD_DIR}
             -p ${ARG_PKG}
             -s ${GENJAVA_SOURCES_DOT}
-        COMMAND touch ${DROPPINGS_FILE}
+        DEPENDS ${GENJAVA_BIN} ${ARG_GENERATED_FILES}
         COMMENT "Generating Java gradle project from ${ARG_PKG}"
     )
+   
+
+    
 
     ################################
     # Compile Gradle Subproject
@@ -94,12 +107,13 @@ macro(_generate_module_java ARG_PKG ARG_GEN_OUTPUT_DIR ARG_GENERATED_FILES)
             --compile
             -o ${GRADLE_BUILD_DIR}
             -p ${ARG_PKG}
-        DEPENDS ${GRADLE_BUILD_FILE} ${ARG_GENERATED_FILES}
+        # DEPENDS ${GRADLE_BUILD_FILE} ${ARG_GENERATED_FILES}
         WORKING_DIRECTORY ${GRADLE_BUILD_DIR}/${ARG_PKG}
         COMMENT "Compiling Java code for ${ARG_PKG}"
     )
     add_dependencies(${ARG_PKG}_generate_messages ${ARG_PKG}_generate_messages_java_gradle)
-
+    add_dependencies(${ARG_PKG}_generate_messages_java_gradle ${ARG_PKG}_generate_messages_java_gradle_create)
+   
     ################################
     # Dependent Targets
     ################################
