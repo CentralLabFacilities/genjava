@@ -103,7 +103,7 @@ def create_dependency_string(project_name, msg_package_index):
     return gradle_dependency_string
 
 
-def create_msg_package_index(print_lists=True, verbosity=False):
+def create_msg_package_index(print_lists=False, verbosity=False):
     """
       Scans the package paths and creates a package index always taking the
       highest in the workspace chain (i.e. takes an overlay in preference when
@@ -131,7 +131,7 @@ def create_msg_package_index(print_lists=True, verbosity=False):
                 'genmsg' in [dep.name for dep in package.build_depends] or
                 package.name in rosjava_build_tools.catkin.message_package_whitelist):
                 if (package.name not in rosjava_build_tools.catkin.message_package_blacklist):
-                    if print_lists and verbosity:
+                    if verbosity:
                         if package.name in package_index:
                             print("!!Overlay!!")
                             print("  %s" % package.name)
@@ -162,7 +162,7 @@ def handle(function, path, excinfo):
     eprint("error:", function, path, excinfo)
 
 
-def create(msg_pkg_name, output_dir, sources_dir = None, verbosity=False, print_lists=True):
+def create(msg_pkg_name, output_dir, sources_dir = None, verbosity=False, print_lists=False):
     '''
     Creates a standalone single project gradle build instance in the specified output directory and
     populates it with gradle wrapper and build.gradle file that will enable building of the artifact later.
@@ -177,7 +177,10 @@ def create(msg_pkg_name, output_dir, sources_dir = None, verbosity=False, print_
     os.makedirs(genjava_gradle_dir)
     msg_package_index = create_msg_package_index(print_lists=print_lists, verbosity=verbosity)
     if msg_pkg_name not in msg_package_index.keys():
-        raise IOError("could not find %s among message packages. Does the that package have a <build_depend> on message_generation in its package.xml?" % msg_pkg_name)
+        error = "could not find %s among message packages. Does the that package have a <build_depend> on message_generation in its package.xml?" % msg_pkg_name
+        eprint(error)
+        eprint("Msg search path: " + str(rospkg.get_ros_package_path()))
+        raise IOError("could not find %s" % msg_pkg_name)
 
     msg_dependencies = create_dependency_string(msg_pkg_name, msg_package_index)
 
@@ -208,7 +211,7 @@ def build(msg_pkg_name, output_dir, verbosity):
     if verbosity:
         info = cmd[:]
         info.append('info')
-        subprocess.call(info)
+        subprocess.call(info, stdout=sys.stderr)
         print("CALLING COMMAND: %s" % cmd)
 
     return subprocess.call(cmd, stderr=subprocess.STDOUT,)

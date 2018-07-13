@@ -10,20 +10,31 @@ set(GENJAVA_BIN ${GENJAVA_BIN_DIR}/genjava_gradle_project.py)
 set(genjava_INSTALL_DIR "repository/org/ros/rosjava_messages")
 
 macro(_generate_msg_java ARG_PKG ARG_MSG ARG_IFLAGS ARG_MSG_DEPS ARG_GEN_OUTPUT_DIR)
-  #MESSAGE("_generate_msg_java ")
-  #MESSAGE("ARG_MSG: ${ARG_MSG}")
-  #MESSAGE(${ARG_MSG_DEPS})
+    if($ENV{ROS_GRADLE_VERBOSE})
+        MESSAGE("\n_generate_msg_java ")
+        MESSAGE(" ARG_MSG: ${ARG_MSG}")
+        MESSAGE(" ARG_MSG_DEPS: ${ARG_MSG_DEPS}")
+        MESSAGE(" ARG_GEN_OUTPUT_DIR: ${ARG_GEN_OUTPUT_DIR}")
+    endif()
 
   list(APPEND ALL_GEN_OUTPUT_FILES_java ${ARG_MSG} ${ARG_MSG_DEPS})
+
+  # Fetch Path of msgs files, using this for generated .msg (actions)
   get_filename_component(GENJAVA_SOURCE_PATH ${ARG_MSG} DIRECTORY)
   list(APPEND GENJAVA_SOURCES ${GENJAVA_SOURCE_PATH})
 endmacro()
 
 macro(_generate_srv_java ARG_PKG ARG_SRV ARG_IFLAGS ARG_MSG_DEPS ARG_GEN_OUTPUT_DIR)
-  #MESSAGE("_generate_srv_java ")
-  #MESSAGE("ARG_SRV: ${ARG_SRV}")
+    if($ENV{ROS_GRADLE_VERBOSE})
+        #MESSAGE("_generate_srv_java ")
+        #MESSAGE("ARG_SRV: ${ARG_SRV}")
+        #MESSAGE("ARG_MSG_DEPS: ${ARG_MSG_DEPS}")
+    endif()
+  
 
   list(APPEND ALL_GEN_OUTPUT_FILES_java ${ARG_SRV} ${ARG_MSG_DEPS})
+
+
   get_filename_component(GENJAVA_SOURCE_PATH ${ARG_SRV} DIRECTORY)
   list(APPEND GENJAVA_SOURCES ${GENJAVA_SOURCE_PATH})
 endmacro()
@@ -36,24 +47,22 @@ endmacro()
 # To facilitate this, the ARG_GENERATED_FILES is actually just the underlying ARG_MSG and ARG_SRV
 # files which we feed the commands as DEPENDS to trigger their execution.
 macro(_generate_module_java ARG_PKG ARG_GEN_OUTPUT_DIR ARG_GENERATED_FILES)
-    #MESSAGE("_generate_module_java")
-    #MESSAGE("ARG_PKG: ${ARG_PKG}")
-    #MESSAGE("ARG_GEN_OUTPUT_DIR: ${ARG_GEN_OUTPUT_DIR}")
-    #MESSAGE("ARG_GENERATED_FILES: ${ARG_GENERATED_FILES}")
-    list(REMOVE_DUPLICATES GENJAVA_SOURCES)
-    #MESSAGE("GENJAVA_SOURCES: ${GENJAVA_SOURCES}")
-
-    string(REPLACE ";" ":" GENJAVA_SOURCES_DOT "${GENJAVA_SOURCES}")
 
     set(ROS_GRADLE_VERBOSE $ENV{ROS_GRADLE_VERBOSE})
     if(ROS_GRADLE_VERBOSE)
         set(verbosity "--verbosity")
         MESSAGE(WARNING "using verbose message gen")
+        MESSAGE("\n_generate_module_java")
+        MESSAGE(" ARG_PKG: ${ARG_PKG}")
+        MESSAGE(" ARG_GEN_OUTPUT_DIR: ${ARG_GEN_OUTPUT_DIR}")
+        MESSAGE(" ARG_GENERATED_FILES: ${ARG_GENERATED_FILES}")
     else()
         set(verbosity "")
-        MESSAGE(WARNING "not using verbose message gen")
     endif()
-    
+
+    list(REMOVE_DUPLICATES GENJAVA_SOURCES)
+    string(REPLACE ";" ":" GENJAVA_SOURCES_DOT "${GENJAVA_SOURCES}")
+    #MESSAGE("GENJAVA_SOURCES: ${GENJAVA_SOURCES}")
 
     ################################
     # Gradle Subproject
@@ -78,6 +87,13 @@ macro(_generate_module_java ARG_PKG ARG_GEN_OUTPUT_DIR ARG_GENERATED_FILES)
     #     COMMENT "Generating Java gradle project from ${ARG_PKG}"
     # )
 
+    if(ROS_GRADLE_VERBOSE)
+        MESSAGE("\nCreate project target")
+        MESSAGE(" GRADLE_BUILD_DIR (-o): ${GRADLE_BUILD_DIR}")
+        MESSAGE(" ARG_PKG (-p): ${ARG_PKG}")
+        MESSAGE(" GENJAVA_SOURCES_DOT (-s): ${GENJAVA_SOURCES_DOT}")
+    endif()
+
     add_custom_target(${ARG_PKG}_generate_messages_java_gradle_create
         COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENJAVA_BIN}
             ${verbosity}
@@ -100,7 +116,6 @@ macro(_generate_module_java ARG_PKG ARG_GEN_OUTPUT_DIR ARG_GENERATED_FILES)
     # the last thing, then it may be trying to compile while dependencies are still getting
     # themselves ready for ${ARG_PKG}_generate_messages in parallel.
     # (i.e. beware of sequencing add_custom_command, it usually has to compete)
-
     add_custom_target(${ARG_PKG}_generate_messages_java_gradle
         COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENJAVA_BIN}
             ${verbosity}
