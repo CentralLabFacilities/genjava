@@ -14,9 +14,6 @@
  * the License.
  */
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.6'
-}
 
 buildscript {
     def rosMavenPath = "$System.env.ROS_MAVEN_PATH".split(':').collect { 'file://' + it }
@@ -63,61 +60,42 @@ dependencies {
     %(msg_dependencies)s
 }
 
-jar {
-    from sourceSets.main.output.classesDir
-    manifest = osgiManifest {
-        classesDir = sourceSets.main.output.classesDir
-        classpath = configurations.runtime
+task info {
+    doLast {
+        println "\nProject Info"
+        println "============\n"
+        println "Name          : ${rootProject}"
+        println "Dir           : ${projectDir}"
+        println "Group         : ${group}"
+        println "Version       : ${version}"
+        println "Configurations: " + configurations
+
+        println "\nPackage Info"
+        println "============\n"
+        println "Name          : %(project_name)s"
+        println "Dir           : %(pkg_directory)s"
+        println "ROS MAVEN PATH: ${System.getenv("ROS_MAVEN_PATH")}"
+        project.repositories.each{
+            println "MAVEN REPO    : ${it.getUrl()}"
+        }
+
+        println "\nGenerate Info"
+        println "============\n"
+        println "Output Dir    : ${generated_sources_directory}"
+        println "Task Args     : " + tasks["generateSources"].args
+        tasks["generateSources"].outputs.getFiles().getAsFileTree().each {
+            println "Files         : ${it}"
+        }
+
+        println "\nPublish Info"
+        println "============\n"
+
+        println "publishMavenJavaPublicationToMavenRepository"
+        project.publishing.repositories.each{
+            println "Target        : ${it.getUrl()}"
+        }
     }
+    
 }
-
-task info << {
-    println "\nProject Info"
-    println "============\n"
-    println "Name          : ${rootProject}"
-    println "Dir           : ${projectDir}"
-    println "Group         : ${group}"
-    println "Version       : ${version}"
-    println "Configurations: " + configurations
-
-    println "\nPackage Info"
-    println "============\n"
-    println "Name          : %(project_name)s"
-    println "Dir           : %(pkg_directory)s"
-    println "ROS MAVEN PATH: ${System.getenv("ROS_MAVEN_PATH")}"
-    project.repositories.each{
-        println "MAVEN REPO    : ${it.getUrl()}"
-    }
-
-    println "\nGenerate Info"
-    println "============\n"
-    println "Output Dir    : ${generated_sources_directory}"
-    println "Task Args     : " + tasks["generateSources"].args
-    tasks["generateSources"].outputs.getFiles().getAsFileTree().each {
-        println "Files         : ${it}"
-    }
-
-    println "\nPublish Info"
-    println "============\n"
-
-    println "publishMavenJavaPublicationToMavenRepository"
-    project.publishing.repositories.each{
-        println "Target        : ${it.getUrl()}"
-    }
-}
-
-/* Damon's message generator doesn't catch every message. It expects everything to be nicely under 'msg'
- * and that directory to be under the package root. It also expects every msg it finds should be buildable.
- * It kinda works until now because it ignores any package which doesn't conform to this and those are just
- * test packages (we hope).
- *  
- * Until we get this properly fixed (it fails in genjava), then we use the following bugfix to deal with the
- * 'Could not copy MANIFEST.MF...' error that occurs when no sources are to be made for an artifact.
- */
-task bugfixtask << {
-    mkdir sourceSets.main.output.classesDir
-}
-
-jar.dependsOn(bugfixtask)
 
 defaultTasks 'publish'
