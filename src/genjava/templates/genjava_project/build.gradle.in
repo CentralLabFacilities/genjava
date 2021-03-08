@@ -25,8 +25,10 @@ buildscript {
             }
         }
         mavenLocal()
-        maven {
-            url rosMavenRepository
+        if (rosMavenRepository != null) {
+            maven {
+                url rosMavenRepository
+            }
         }
     }
     dependencies {
