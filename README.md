@@ -17,7 +17,7 @@ This doesn't work exactly though because it doesn't pull in the full classpath. 
         generateSourcesTask.description = "Generate sources for " + pkg.name
         generateSourcesTask.outputs.dir(p.file(generatedSourcesDir))
         generateSourcesTask.args = new ArrayList<String>(['--output-path', generatedSourcesDir, '--package-path', pkg.directory, '--package-names', pkg.name])
-        generateSourcesTask.classpath = p.configurations.runtime
+        generateSourcesTask.classpath = p.configurations.runtimeClasspath
         generateSourcesTask.main = 'org.ros.internal.message.GenerateInterfaces'
         p.tasks.compileJava.source generateSourcesTask.outputs.files
 ```
