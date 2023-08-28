@@ -37,7 +37,6 @@ buildscript {
 }
 
 apply plugin: 'ros-java'
-apply plugin: 'osgi'
 group 'org.ros.rosjava_messages'
 version = '%(project_version)s'
 
