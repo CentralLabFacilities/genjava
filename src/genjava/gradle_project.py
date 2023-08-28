@@ -99,7 +99,7 @@ def create_dependency_string(project_name, msg_package_index):
             dependency_package = msg_package_index[dep.name]
         except KeyError:
             continue  # it's not a message package
-        gradle_dependency_string += "  compile 'org.ros.rosjava_messages:" + dependency_package.name + ":" + dependency_package.version + "'\n"
+        gradle_dependency_string += "  implementation 'org.ros.rosjava_messages:" + dependency_package.name + ":" + dependency_package.version + "'\n"
     return gradle_dependency_string
 
 

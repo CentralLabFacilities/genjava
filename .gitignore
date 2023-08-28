@@ -1,2 +1,7 @@
-src/genjava/*.pyc
+*.pyc
 build
+.catkin_tools
+.idea
+logs
+devel
+__pycache__
