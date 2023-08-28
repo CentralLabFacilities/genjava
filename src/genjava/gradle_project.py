@@ -241,7 +241,7 @@ def standalone_create_and_build(msg_pkg_name, output_dir, verbosity, avoid_rebui
         cmd.append('--quiet')
     #print("COMMAND........................%s" % cmd)
     ret = subprocess.call(cmd, stderr=subprocess.STDOUT,)
-    if ret is 0:
+    if ret == 0:
         return True
     else:
         return ret
