@@ -57,6 +57,7 @@ task generateSources (type: JavaExec) {
 }
 
 dependencies {
+    implementation 'io.netty:netty:3.5.2.Final'
     implementation 'org.ros.rosjava_bootstrap:message_generation:[0.3,0.4)'
     %(msg_dependencies)s
 }
