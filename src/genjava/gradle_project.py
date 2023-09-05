@@ -97,13 +97,13 @@ def create_dependency_string(project_name, msg_package_index):
     # always inject std_msgs
     if not any(d.name == 'std_msgs' for d in package.build_depends):
         dependency_package = msg_package_index["std_msgs"]
-        gradle_dependency_string += "  implementation 'org.ros.rosjava_messages:" + dependency_package.name + ":" + dependency_package.version + "'\n"
+        gradle_dependency_string += "  api 'org.ros.rosjava_messages:" + dependency_package.name + ":" + dependency_package.version + "'\n"
     for dep in package.build_depends:
         try:
             dependency_package = msg_package_index[dep.name]
         except KeyError:
             continue  # it's not a message package
-        gradle_dependency_string += "  implementation 'org.ros.rosjava_messages:" + dependency_package.name + ":" + dependency_package.version + "'\n"
+        gradle_dependency_string += "  api 'org.ros.rosjava_messages:" + dependency_package.name + ":" + dependency_package.version + "'\n"
     return gradle_dependency_string
 
 
