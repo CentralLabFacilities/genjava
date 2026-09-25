@@ -29,6 +29,18 @@ buildscript {
                 url rosMavenRepository
             }
         }
+         maven {
+            // This registry only contains the org/apache/commons/* dependencies
+            url "https://gitlab.ub.uni-bielefeld.de/api/v4/projects/840/packages/maven"
+            name "GitLab"
+            credentials(HttpHeaderCredentials) {
+                name = 'read_maven_open'
+                value = "gldt-DQsrFbxjtz9hn-yY1oJE" // your welcome
+            }
+            authentication {
+                header(HttpHeaderAuthentication)
+            }
+        }
     }
     dependencies {
         classpath group: 'org.ros.rosjava_bootstrap', name: 'gradle_plugins', version: '[0.3,0.4)'
